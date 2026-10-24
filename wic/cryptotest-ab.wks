@@ -1,0 +1,10 @@
+# p1: FAT boot partition - MLO, u-boot.img, (+ uboot.env, rauc.status at runtime)
+part --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --active --align 1024 --fixed-size 64M
+
+# p2: rootfs slot A
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfsA --align 1024 --fixed-size 1024M
+
+# p3: rootfs slot B
+part --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfsB --align 1024 --fixed-size 1024M
+
+bootloader --ptable msdos
