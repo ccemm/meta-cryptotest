@@ -1,3 +1,4 @@
 
 bitbake-layers add-layer meta-cryptotest
 bitbake core-image-rupdate
+bitbake core-image-rupdate -c populate_sdk
