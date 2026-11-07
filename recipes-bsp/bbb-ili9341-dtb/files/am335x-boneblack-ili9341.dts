@@ -1,0 +1,57 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * BeagleBone Black + ILI9341 2.8" 240x320 SPI display
+ *
+ * Wiring (BBB 3.3 V logic!):
+ *   P9_22  SPI0_SCLK  -> SCK
+ *   P9_18  SPI0_D1    -> MOSI (SDI)
+ *   P9_21  SPI0_D0    <- MISO (SDO)   optional, display works without it
+ *   P9_17  SPI0_CS0   -> CS
+ *   P9_15  GPIO1_16   -> D/C
+ *   P9_23  GPIO1_17   -> RESET
+ *   P9_3/4 3.3 V, P9_1/2 GND, backlight (LED) to 3.3 V or via a GPIO
+ */
+
+#include "ti/omap/am335x-boneblack.dts"
+
+&am33xx_pinmux {
+	spi0_pins: spi0-pins {
+		pinctrl-single,pins = <
+			AM33XX_PADCONF(AM335X_PIN_SPI0_SCLK, PIN_INPUT_PULLUP,  MUX_MODE0)	/* P9_22 */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_D0,   PIN_INPUT_PULLUP,  MUX_MODE0)	/* P9_21 MISO */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_D1,   PIN_OUTPUT_PULLUP, MUX_MODE0)	/* P9_18 MOSI */
+			AM33XX_PADCONF(AM335X_PIN_SPI0_CS0,  PIN_OUTPUT_PULLUP, MUX_MODE0)	/* P9_17 CS0  */
+		>;
+	};
+
+	ili9341_pins: ili9341-pins {
+		pinctrl-single,pins = <
+			AM33XX_PADCONF(AM335X_PIN_GPMC_A0, PIN_OUTPUT, MUX_MODE7)	/* P9_15 gpio1_16 D/C   */
+			AM33XX_PADCONF(AM335X_PIN_GPMC_A1, PIN_OUTPUT, MUX_MODE7)	/* P9_23 gpio1_17 RESET */
+		>;
+	};
+};
+
+&spi0 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0_pins>;
+
+	display@0 {
+		compatible = "adafruit,yx240qv29", "ilitek,ili9341";
+		reg = <0>;					/* chip select 0 */
+		pinctrl-names = "default";
+		pinctrl-0 = <&ili9341_pins>;
+
+		spi-max-frequency = <16000000>;
+		dc-gpios = <&gpio1 16 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio1 17 GPIO_ACTIVE_HIGH>;
+		rotation = <270>;				/* 0, 90, 180 or 270 */
+	};
+
+};
+
+/* HDMI is not used: disable the LCD controller so the ILI9341 is the only DRM device */
+&lcdc {
+	status = "disabled";
+};

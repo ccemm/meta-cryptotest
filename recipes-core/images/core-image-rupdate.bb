@@ -5,6 +5,10 @@ require recipes-core/images/core-image-minimal.bb
 IMAGE_INSTALL += "crypto-test filesoverlay rauc \
                   kernel-module-squashfs kernel-module-dm-mod kernel-module-dm-verity \
                   e2fsprogs-resize2fs libubootenv-bin"
+
+IMAGE_INSTALL += "bbb-ili9341-dtb"
+IMAGE_INSTALL += "qt-display-test"
+
 KERNEL_MODULE_AUTOLOAD += "squashfs dm-mod dm-verity"
 
 IMAGE_FSTYPES += "ext4 wic wic.bmap"
